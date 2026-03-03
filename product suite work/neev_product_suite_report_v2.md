@@ -1,0 +1,153 @@
+# Neev Product Suite — Backtest Report v2
+
+Generated: 2026-03-03 01:58
+
+**Methodology:** Calendar month stepping (7th of each month), backward-only NAV lookup, Brent's method XIRR, post-tax with shared LTCG exemption, exit load on arb FIFO, bank floor deducted.
+
+**Products:** Reserve, Market Entry, Accelerate, Navigate (Tactical dropped — structurally unviable on MF rails).
+
+---
+
+## 1. Return Comparison
+
+### Pre-Tax and Post-Tax Returns
+
+#### 3-Year (Mar 2023 - Mar 2026) | conservative
+
+| Product | Invested | Final Value | Pre-Tax Gain | Post-Tax Gain | XIRR | Extra vs SA |
+|---------|----------|-------------|--------------|---------------|------|-------------|
+| Savings A/c | ₹20.20 L | ₹21.45 L | ₹1.25 L | ₹90.4K | 3.73% | ₹0 |
+| Fixed Deposit | ₹20.20 L | ₹22.79 L | ₹2.59 L | ₹1.82 L | 7.58% | ₹91.2K |
+| Blind SIP | ₹20.20 L | ₹24.25 L | ₹4.05 L | ₹3.61 L | 11.58% | ₹2.71 L |
+| Neev Reserve | ₹20.20 L | ₹22.74 L | ₹2.54 L | ₹2.38 L | 7.44% | ₹1.48 L |
+| Neev Market Entry | ₹20.20 L | ₹23.19 L | ₹2.99 L | ₹2.70 L | 8.67% | ₹1.80 L |
+| Neev Accelerate | ₹20.20 L | ₹24.48 L | ₹4.28 L | ₹3.81 L | 12.19% | ₹2.90 L |
+| Neev Navigate | ₹20.20 L | ₹24.33 L | ₹4.13 L | ₹3.67 L | 11.78% | ₹2.77 L |
+
+#### 3-Year (Mar 2023 - Mar 2026) | moderate
+
+| Product | Invested | Final Value | Pre-Tax Gain | Post-Tax Gain | XIRR | Extra vs SA |
+|---------|----------|-------------|--------------|---------------|------|-------------|
+| Savings A/c | ₹39.70 L | ₹42.12 L | ₹2.42 L | ₹1.72 L | 3.73% | ₹0 |
+| Fixed Deposit | ₹39.70 L | ₹44.72 L | ₹5.02 L | ₹3.52 L | 7.59% | ₹1.79 L |
+| Blind SIP | ₹39.70 L | ₹47.46 L | ₹7.76 L | ₹6.77 L | 11.46% | ₹5.05 L |
+| Neev Reserve | ₹39.70 L | ₹44.66 L | ₹4.96 L | ₹4.49 L | 7.49% | ₹2.77 L |
+| Neev Market Entry | ₹39.70 L | ₹45.48 L | ₹5.78 L | ₹5.08 L | 8.67% | ₹3.36 L |
+| Neev Accelerate | ₹39.70 L | ₹47.93 L | ₹8.23 L | ₹7.17 L | 12.11% | ₹5.45 L |
+| Neev Navigate | ₹39.70 L | ₹47.63 L | ₹7.93 L | ₹6.92 L | 11.70% | ₹5.19 L |
+
+#### 3-Year (Mar 2023 - Mar 2026) | aggressive
+
+| Product | Invested | Final Value | Pre-Tax Gain | Post-Tax Gain | XIRR | Extra vs SA |
+|---------|----------|-------------|--------------|---------------|------|-------------|
+| Savings A/c | ₹77.70 L | ₹82.35 L | ₹4.65 L | ₹3.29 L | 3.74% | ₹0 |
+| Fixed Deposit | ₹77.70 L | ₹87.35 L | ₹9.65 L | ₹6.76 L | 7.59% | ₹3.47 L |
+| Blind SIP | ₹77.70 L | ₹92.38 L | ₹14.68 L | ₹12.67 L | 11.32% | ₹9.39 L |
+| Neev Reserve | ₹77.70 L | ₹87.26 L | ₹9.56 L | ₹8.52 L | 7.52% | ₹5.24 L |
+| Neev Market Entry | ₹77.70 L | ₹88.75 L | ₹11.05 L | ₹9.58 L | 8.64% | ₹6.29 L |
+| Neev Accelerate | ₹77.70 L | ₹93.31 L | ₹15.61 L | ₹13.46 L | 11.99% | ₹10.18 L |
+| Neev Navigate | ₹77.70 L | ₹92.74 L | ₹15.04 L | ₹12.98 L | 11.58% | ₹9.69 L |
+
+#### 5-Year (Mar 2021 - Mar 2026) | conservative
+
+| Product | Invested | Final Value | Pre-Tax Gain | Post-Tax Gain | XIRR | Extra vs SA |
+|---------|----------|-------------|--------------|---------------|------|-------------|
+| Savings A/c | ₹32.20 L | ₹35.45 L | ₹3.25 L | ₹2.30 L | 3.66% | ₹0 |
+| Fixed Deposit | ₹32.20 L | ₹39.12 L | ₹6.92 L | ₹4.85 L | 7.44% | ₹2.54 L |
+| Blind SIP | ₹32.20 L | ₹43.99 L | ₹11.79 L | ₹10.21 L | 11.97% | ₹7.91 L |
+| Neev Reserve | ₹32.20 L | ₹38.82 L | ₹6.62 L | ₹5.95 L | 7.14% | ₹3.65 L |
+| Neev Market Entry | ₹32.20 L | ₹42.34 L | ₹10.14 L | ₹8.80 L | 10.49% | ₹6.50 L |
+| Neev Accelerate | ₹32.20 L | ₹46.54 L | ₹14.34 L | ₹12.38 L | 14.15% | ₹10.07 L |
+| Neev Navigate | ₹32.20 L | ₹45.89 L | ₹13.69 L | ₹11.83 L | 13.60% | ₹9.52 L |
+
+#### 5-Year (Mar 2021 - Mar 2026) | moderate
+
+| Product | Invested | Final Value | Pre-Tax Gain | Post-Tax Gain | XIRR | Extra vs SA |
+|---------|----------|-------------|--------------|---------------|------|-------------|
+| Savings A/c | ₹63.70 L | ₹70.06 L | ₹6.36 L | ₹4.48 L | 3.66% | ₹0 |
+| Fixed Deposit | ₹63.70 L | ₹77.26 L | ₹13.56 L | ₹9.49 L | 7.44% | ₹5.00 L |
+| Blind SIP | ₹63.70 L | ₹86.73 L | ₹23.03 L | ₹19.79 L | 11.95% | ₹15.30 L |
+| Neev Reserve | ₹63.70 L | ₹76.77 L | ₹13.07 L | ₹11.59 L | 7.20% | ₹7.11 L |
+| Neev Market Entry | ₹63.70 L | ₹83.64 L | ₹19.94 L | ₹17.15 L | 10.53% | ₹12.67 L |
+| Neev Accelerate | ₹63.70 L | ₹91.86 L | ₹28.16 L | ₹24.16 L | 14.20% | ₹19.67 L |
+| Neev Navigate | ₹63.70 L | ₹90.59 L | ₹26.89 L | ₹23.08 L | 13.66% | ₹18.60 L |
+
+#### 5-Year (Mar 2021 - Mar 2026) | aggressive
+
+| Product | Invested | Final Value | Pre-Tax Gain | Post-Tax Gain | XIRR | Extra vs SA |
+|---------|----------|-------------|--------------|---------------|------|-------------|
+| Savings A/c | ₹1.26 Cr | ₹1.38 Cr | ₹12.40 L | ₹8.71 L | 3.67% | ₹0 |
+| Fixed Deposit | ₹1.26 Cr | ₹1.52 Cr | ₹26.40 L | ₹18.48 L | 7.45% | ₹9.77 L |
+| Blind SIP | ₹1.26 Cr | ₹1.70 Cr | ₹44.69 L | ₹38.25 L | 11.93% | ₹29.54 L |
+| Neev Reserve | ₹1.26 Cr | ₹1.51 Cr | ₹25.61 L | ₹22.57 L | 7.24% | ₹13.86 L |
+| Neev Market Entry | ₹1.26 Cr | ₹1.65 Cr | ₹38.90 L | ₹33.32 L | 10.56% | ₹24.60 L |
+| Neev Accelerate | ₹1.26 Cr | ₹1.81 Cr | ₹54.91 L | ₹46.97 L | 14.24% | ₹38.26 L |
+| Neev Navigate | ₹1.26 Cr | ₹1.78 Cr | ₹52.46 L | ₹44.88 L | 13.70% | ₹36.17 L |
+
+## 2. Risk-Adjusted Metrics
+
+| Product | Ann. Return | Volatility | Sharpe | Sortino | Calmar | Max DD |
+|---------|-------------|------------|--------|---------|--------|--------|
+| Savings A/c | 3.66% | 0.04% | -56.44 | -3.70 | inf | 0.00% |
+| Fixed Deposit | 7.44% | 0.08% | 17.40 | inf | inf | 0.00% |
+| Reserve | 7.20% | 0.58% | 2.08 | 2.63 | inf | 0.00% |
+| Market Entry | 10.53% | 8.03% | 0.56 | 0.72 | 4.26 | -2.47% |
+| Accelerate | 14.20% | 9.23% | 0.89 | 1.03 | 2.27 | -6.25% |
+| Navigate | 13.66% | 9.44% | 0.81 | 0.95 | 2.14 | -6.39% |
+| Blind SIP | 11.95% | 12.73% | 0.47 | 0.56 | 2.72 | -4.40% |
+
+## 3. Stress Test Results
+
+### COVID crash
+
+| Product | Event Return | Max Drop | Recovery |
+|---------|--------------|----------|----------|
+
+### COVID recovery
+
+| Product | Event Return | Max Drop | Recovery |
+|---------|--------------|----------|----------|
+
+### 2021-22 correction
+
+| Product | Event Return | Max Drop | Recovery |
+|---------|--------------|----------|----------|
+| savings | 3.25% | 0.00% | 0 mo |
+| fd | 6.52% | 0.00% | 0 mo |
+| blind_sip | -8.96% | -13.30% | 1 mo |
+| reserve | 3.72% | 0.00% | 0 mo |
+| market_entry | -1.29% | -3.51% | 1 mo |
+| grow | -5.08% | -6.14% | 1 mo |
+| grow_index | -5.57% | -6.51% | 1 mo |
+
+### 2024 consolidation
+
+| Product | Event Return | Max Drop | Recovery |
+|---------|--------------|----------|----------|
+| savings | 1.23% | 0.00% | 0 mo |
+| fd | 2.46% | 0.00% | 0 mo |
+| blind_sip | -4.68% | -4.68% | 4 mo |
+| reserve | 2.55% | 0.00% | 0 mo |
+| market_entry | -3.50% | -3.50% | 3 mo |
+| grow | -1.38% | -1.38% | 4 mo |
+| grow_index | -1.75% | -1.75% | 4 mo |
+
+## 4. Rolling 3-Year Returns
+
+## 5. Sensitivity Analysis
+
+## 6. Product Decision: Tactical Dropped
+
+Tactical dip-buying is structurally unviable on mutual fund rails:
+
+1. **MF settlement latency** — 1-3 day gap means you buy the bounce, not the dip
+2. **Cash drag** — Money at 7% while equity averages 12-13% CAGR
+3. **BAFs solve it better** — ICICI Pru BAF does dynamic allocation internally
+4. **No platform offers it** — Not Scripbox, Groww, Kuvera, or Smallcase
+5. **BSE StAR MF limitation** — No conditional STP
+
+The defensible version (PE-based pace modulation) is in Market Entry.
+
+---
+
+*Four products: Reserve (park), Market Entry (deploy), Accelerate (grow — active), Navigate (grow — index).*
