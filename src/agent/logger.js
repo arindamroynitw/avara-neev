@@ -17,7 +17,7 @@ export function logAICall({ mode, userMessage, historyLength, productContext, li
     const client = getClient();
     if (!client) return;
 
-    client.from('ai_logs').insert({
+    const payload = {
       mode,
       user_message: userMessage,
       history_length: historyLength,
@@ -29,12 +29,13 @@ export function logAICall({ mode, userMessage, historyLength, productContext, li
       duration_ms: durationMs,
       error: error || null,
       retried,
-      user_name: state?.userName || null,
-      monthly_salary: state?.monthlySalary || null,
-      months_active: state?.monthsActive || null,
-      total_balance: state?.totalBalance || null,
-    }).then();
-  } catch {
-    // Never let logging break the app
+    };
+    console.log('[logger] inserting:', payload);
+    client.from('ai_logs').insert(payload).then(({ error: e }) => {
+      if (e) console.error('[logger] insert failed:', e);
+      else console.log('[logger] insert success');
+    });
+  } catch (e) {
+    console.error('[logger] exception:', e);
   }
 }
