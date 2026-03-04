@@ -39,7 +39,7 @@ export default function InputBar() {
     <div
       style={{
         position: 'fixed',
-        bottom: '76px',
+        bottom: '84px',
         left: '50%',
         transform: 'translateX(-50%)',
         width: 'calc(100% - 40px)',

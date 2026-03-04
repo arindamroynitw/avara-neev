@@ -1,6 +1,7 @@
 import { generateText } from 'ai';
 import { createOpenAI } from '@ai-sdk/openai';
 import { buildSystemPrompt } from './systemPrompt';
+import { logAICall } from './logger';
 
 let openaiInstance = null;
 
@@ -89,20 +90,25 @@ export async function callAI(userMessage, conversationHistory, state, mode = 'su
 
   const temperature = mode === 'rm-chat' ? 0.75 : 0.7;
   const maxTokens = mode === 'rm-chat' ? 3000 : 5000;
+  const productContext = state?.surfaceResponse?.context?.product || state?.rmChat?.entryContext?.product || null;
+  const logCtx = { mode, userMessage, historyLength: messages.length, productContext, lifecycle: state?.lifecycle, state };
 
   try {
+    const startTime = Date.now();
     const { text } = await generateText({
       model: openai('gpt-4o'),
       system: buildSystemPrompt(state, mode),
       messages,
       temperature,
       maxTokens,
+      responseFormat: { type: 'json' },
     });
 
     // Parse response — strip markdown fences (case-insensitive) and trim
     const cleaned = text.replace(/```[\w]*\s*/gi, '').trim();
 
     const cards = parseCardsFromText(cleaned);
+    logAICall({ ...logCtx, cards, durationMs: Date.now() - startTime, error: null, retried: false });
     return { cards };
   } catch (error) {
     if (error.message?.includes('VITE_OPENAI_API_KEY') || error.message?.includes('Set VITE_OPENAI_API_KEY')) {
@@ -114,20 +120,26 @@ export async function callAI(userMessage, conversationHistory, state, mode = 'su
     if (status === 429 || (status >= 500 && status < 600)) {
       await new Promise(r => setTimeout(r, 2000));
       try {
+        const retryStart = Date.now();
         const { text } = await generateText({
           model: openai('gpt-4o'),
           system: buildSystemPrompt(state, mode),
           messages,
           temperature,
           maxTokens,
+          responseFormat: { type: 'json' },
         });
         const cleaned = text.replace(/```[\w]*\s*/gi, '').trim();
-        return { cards: parseCardsFromText(cleaned) };
-      } catch {
+        const cards = parseCardsFromText(cleaned);
+        logAICall({ ...logCtx, cards, durationMs: Date.now() - retryStart, error: null, retried: true });
+        return { cards };
+      } catch (retryError) {
+        logAICall({ ...logCtx, cards: null, durationMs: null, error: retryError.message || 'Retry failed', retried: true });
         throw new Error('I\'m getting a lot of requests right now. Try again in a moment.');
       }
     }
 
+    logAICall({ ...logCtx, cards: null, durationMs: null, error: error.message || 'Unknown error', retried: false });
     throw new Error('Something went wrong. Please try again.');
   }
 }
