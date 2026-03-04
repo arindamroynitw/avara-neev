@@ -24,27 +24,45 @@ function getOpenAI() {
  * Handles: {"cards":[...]}, bare arrays [{...},...], single card {type:...},
  * and text with JSON embedded after a preamble.
  */
+function tryExtractCards(parsed) {
+  if (parsed.cards && Array.isArray(parsed.cards)) return parsed.cards;
+  if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].type) return parsed;
+  if (parsed.type) return [parsed];
+  return null;
+}
+
 function parseCardsFromText(text) {
   // 1. Try direct parse
   try {
-    const parsed = JSON.parse(text);
-    if (parsed.cards && Array.isArray(parsed.cards)) return parsed.cards;
-    if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].type) return parsed;
-    if (parsed.type) return [parsed];
-  } catch {
-    // Not valid JSON as-is — try to extract JSON from the text
-  }
+    const result = tryExtractCards(JSON.parse(text));
+    if (result) return result;
+  } catch { }
 
-  // 2. Try to find a JSON object or array in the text (handles preamble/suffix)
-  const jsonStart = text.search(/[\[{]/);
-  if (jsonStart > 0) {
-    try {
-      const extracted = JSON.parse(text.slice(jsonStart));
-      if (extracted.cards && Array.isArray(extracted.cards)) return extracted.cards;
-      if (Array.isArray(extracted) && extracted.length > 0 && extracted[0].type) return extracted;
-      if (extracted.type) return [extracted];
-    } catch {
-      // Still not valid
+  // 2. Find JSON by matching first open brace/bracket to last matching close
+  const firstBrace = text.indexOf('{');
+  const firstBracket = text.indexOf('[');
+  const jsonStart = (firstBrace >= 0 && (firstBracket < 0 || firstBrace < firstBracket))
+    ? firstBrace : firstBracket;
+
+  if (jsonStart >= 0) {
+    const openChar = text[jsonStart];
+    const closeChar = openChar === '{' ? '}' : ']';
+    const lastClose = text.lastIndexOf(closeChar);
+
+    // Try first-to-last matching brace (handles trailing text)
+    if (lastClose > jsonStart) {
+      try {
+        const result = tryExtractCards(JSON.parse(text.slice(jsonStart, lastClose + 1)));
+        if (result) return result;
+      } catch { }
+    }
+
+    // Fallback: from jsonStart to end
+    if (jsonStart > 0) {
+      try {
+        const result = tryExtractCards(JSON.parse(text.slice(jsonStart)));
+        if (result) return result;
+      } catch { }
     }
   }
 
@@ -55,7 +73,7 @@ function parseCardsFromText(text) {
 /**
  * Call OpenAI via Vercel AI SDK and parse response into cards.
  */
-export async function callAI(userMessage, conversationHistory, state) {
+export async function callAI(userMessage, conversationHistory, state, mode = 'surface') {
   let openai;
   try {
     openai = getOpenAI();
@@ -63,22 +81,26 @@ export async function callAI(userMessage, conversationHistory, state) {
     return { cards: [{ type: 'agent-text', props: { text: 'AI chat is unavailable in demo mode.' } }] };
   }
 
+  const historySlice = mode === 'rm-chat' ? -12 : -10;
   const messages = [
-    ...conversationHistory.slice(-8),
+    ...conversationHistory.slice(historySlice),
     { role: 'user', content: userMessage },
   ];
+
+  const temperature = mode === 'rm-chat' ? 0.75 : 0.7;
+  const maxTokens = mode === 'rm-chat' ? 3000 : 5000;
 
   try {
     const { text } = await generateText({
       model: openai('gpt-4o'),
-      system: buildSystemPrompt(state),
+      system: buildSystemPrompt(state, mode),
       messages,
-      temperature: 0.7,
-      maxTokens: 2000,
+      temperature,
+      maxTokens,
     });
 
     // Parse response — strip markdown fences (case-insensitive) and trim
-    const cleaned = text.replace(/```(?:json|javascript)?\n?/gi, '').trim();
+    const cleaned = text.replace(/```[\w]*\s*/gi, '').trim();
 
     const cards = parseCardsFromText(cleaned);
     return { cards };
@@ -94,12 +116,12 @@ export async function callAI(userMessage, conversationHistory, state) {
       try {
         const { text } = await generateText({
           model: openai('gpt-4o'),
-          system: buildSystemPrompt(state),
+          system: buildSystemPrompt(state, mode),
           messages,
-          temperature: 0.7,
-          maxTokens: 2000,
+          temperature,
+          maxTokens,
         });
-        const cleaned = text.replace(/```(?:json|javascript)?\n?/gi, '').trim();
+        const cleaned = text.replace(/```[\w]*\s*/gi, '').trim();
         return { cards: parseCardsFromText(cleaned) };
       } catch {
         throw new Error('I\'m getting a lot of requests right now. Try again in a moment.');

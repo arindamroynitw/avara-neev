@@ -3,6 +3,7 @@ import { colors, typography, goldGradient, fonts, grainTexture } from '../../sty
 import { useApp } from '../../context/AppContext';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatCompact, formatPercent, formatINR } from '../../utils/format';
+import RMChatCTA from '../../components/shared/RMChatCTA';
 
 export default function HeroSection() {
   const { state } = useApp();
@@ -87,10 +88,11 @@ export default function HeroSection() {
                 ≈{formatINR(weeklyRate)}/week · {formatINR(dailyRate)}/day
               </span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '4px' }}>
               <span style={{ fontFamily: fonts.sans, fontSize: '0.9375rem', fontWeight: 500, color: colors.light }}>
                 Total: {formatCompact(totalBalance)}
               </span>
+              <RMChatCTA text="Talk to your RM" context={{ source: 'home-hero' }} style={{ color: colors.goldLight }} />
             </div>
           </>
         )}

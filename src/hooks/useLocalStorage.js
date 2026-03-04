@@ -4,8 +4,16 @@ const STORAGE_KEY = 'neev-app-state';
 
 export function saveState(state) {
   try {
-    // Don't persist conversation (ephemeral) or toast
-    const { conversation, toast, ...persistable } = state;
+    // Don't persist ephemeral state
+    const { toast, surfaceResponse, activeFlow, ...rest } = state;
+    // Persist rmChat thread but not ephemeral keys
+    const persistable = {
+      ...rest,
+      rmChat: state.rmChat ? {
+        thread: state.rmChat.thread,
+        lastOpenedAt: state.rmChat.lastOpenedAt,
+      } : undefined,
+    };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(persistable));
   } catch {
     // Ignore quota errors
@@ -19,7 +27,13 @@ export function loadState() {
       const parsed = JSON.parse(stored);
       return {
         ...parsed,
-        conversation: { open: false, thread: [], loading: false, error: null },
+        surfaceResponse: { active: false, previousTab: null, hiddenThread: [], currentCards: [], quickReplies: [], turnCount: 0, context: null, loading: false, error: null },
+        activeFlow: null,
+        rmChat: {
+          open: false, loading: false, error: null, entryContext: null,
+          thread: parsed.rmChat?.thread || [],
+          lastOpenedAt: parsed.rmChat?.lastOpenedAt || null,
+        },
         toast: { message: '', visible: false },
       };
     }

@@ -3,7 +3,7 @@ import { colors, fonts, easing } from '../../styles/tokens';
 import { useApp } from '../../context/AppContext';
 
 export default function InputBar() {
-  const { dispatch } = useApp();
+  const { state, dispatch } = useApp();
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
 
@@ -11,9 +11,21 @@ export default function InputBar() {
     const trimmed = value.trim();
     if (!trimmed) return;
 
-    dispatch({ type: 'OPEN_CONVERSATION' });
-    dispatch({ type: 'ADD_MESSAGE', payload: { role: 'user', content: trimmed, timestamp: Date.now() } });
+    if (!state.surfaceResponse.active) {
+      dispatch({ type: 'ENTER_SURFACE_RESPONSE', payload: { previousTab: state.activeTab } });
+    }
+    dispatch({ type: 'ADD_SURFACE_MESSAGE', payload: { role: 'user', content: trimmed, timestamp: Date.now() } });
     setValue('');
+  };
+
+  // Contextual placeholder
+  const getPlaceholder = () => {
+    if (state.surfaceResponse.active) {
+      const ctx = state.surfaceResponse.context;
+      if (ctx?.productName) return `Ask about ${ctx.productName}...`;
+      if (state.surfaceResponse.turnCount > 0) return 'Ask a follow-up...';
+    }
+    return 'Ask Neev anything...';
   };
 
   const handleKeyDown = (e) => {
@@ -55,7 +67,7 @@ export default function InputBar() {
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onKeyDown={handleKeyDown}
-          placeholder="Ask Neev anything..."
+          placeholder={getPlaceholder()}
           style={{
             flex: 1,
             fontFamily: fonts.sans,

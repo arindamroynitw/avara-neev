@@ -1,6 +1,7 @@
 import React from 'react';
 import { colors, fonts, glass, easing } from '../../styles/tokens';
 import { useApp } from '../../context/AppContext';
+import ModeIndicator from './ModeIndicator';
 
 const tabs = [
   {
@@ -44,9 +45,10 @@ const tabs = [
   },
 ];
 
-export default function TabBar({ receded = false }) {
+export default function TabBar() {
   const { state, dispatch } = useApp();
   const { activeTab } = state;
+  const inChatMode = state.surfaceResponse.active || state.rmChat?.open;
 
   return (
     <nav
@@ -59,7 +61,7 @@ export default function TabBar({ receded = false }) {
         maxWidth: '350px',
         ...glass,
         borderRadius: '28px',
-        padding: receded ? '6px 16px' : '8px 16px',
+        padding: '8px 16px',
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
@@ -68,8 +70,9 @@ export default function TabBar({ receded = false }) {
         transition: `all 300ms ${easing.spring}`,
       }}
     >
+      {inChatMode && <ModeIndicator />}
       {tabs.map(tab => {
-        const isActive = activeTab === tab.id;
+        const isActive = !inChatMode && activeTab === tab.id;
         return (
           <button
             key={tab.id}
@@ -78,14 +81,13 @@ export default function TabBar({ receded = false }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: receded ? '0' : '3px',
+              gap: '3px',
               padding: '6px 8px',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               position: 'relative',
               transition: `all 300ms ${easing.spring}`,
-              transform: receded ? 'scale(0.8)' : 'scale(1)',
             }}
           >
             {tab.icon(isActive)}
@@ -97,15 +99,11 @@ export default function TabBar({ receded = false }) {
                 letterSpacing: '0.15em',
                 textTransform: 'uppercase',
                 color: isActive ? colors.dark : colors.muted,
-                opacity: receded ? 0 : 1,
-                transition: `opacity 300ms ${easing.standard}`,
-                maxHeight: receded ? 0 : '20px',
-                overflow: 'hidden',
               }}
             >
               {tab.label}
             </span>
-            {isActive && !receded && (
+            {isActive && (
               <div
                 style={{
                   position: 'absolute',
