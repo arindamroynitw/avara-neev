@@ -55,7 +55,9 @@ export default function DeploymentPlanCard({ bufferBreakdown, sweepAmount, proje
       </div>
 
       <div style={{ fontFamily: fonts.sans, fontSize: '0.8125rem', color: colors.muted, marginBottom: '8px' }}>
-        Earning ~7% vs 3.5%
+        Earning ~7% vs 3.5% · <span style={{ color: colors.gold, fontWeight: 600 }}>
+          +₹{Math.round(sweepAmount * (7.2 - 3.5) / 100 / 365).toLocaleString('en-IN')}/day extra
+        </span>
       </div>
 
       {/* Projected extra */}

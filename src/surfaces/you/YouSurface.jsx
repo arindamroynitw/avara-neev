@@ -24,7 +24,7 @@ export default function YouSurface() {
       <VaultSection />
 
       {/* Simulate time advance */}
-      {state.lifecycle === 'active' && state.metrics.monthsActive === 0 && (
+      {(state.lifecycle === 'active' || state.lifecycle === 'mature') && (
         <div style={{ padding: '0 20px', marginBottom: '8px' }}>
           <button
             onClick={() => dispatch({ type: 'SIMULATE_TIME_ADVANCE' })}
@@ -37,7 +37,7 @@ export default function YouSurface() {
               letterSpacing: '0.05em',
             }}
           >
-            Simulate to Month 2
+            Simulate to Month {state.metrics.monthsActive + 2}
           </button>
         </div>
       )}
@@ -52,6 +52,7 @@ export default function YouSurface() {
         </div>
         <button
           onClick={() => {
+            if (!window.confirm('Reset all data? This will erase everything and restart onboarding.')) return;
             dispatch({ type: 'RESET_ALL' });
             window.localStorage.removeItem('neev-app-state');
           }}

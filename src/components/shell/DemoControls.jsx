@@ -61,7 +61,7 @@ export default function DemoControls() {
           <button
             onClick={() => dispatch({ type: 'TOGGLE_DEMO_PANEL' })}
             style={{
-              width: '28px', height: '28px', borderRadius: '50%',
+              minWidth: '44px', minHeight: '44px', borderRadius: '50%',
               background: colors.darkMid, border: 'none', cursor: 'pointer',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}

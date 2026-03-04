@@ -32,10 +32,7 @@ export function getDeployDispatches(sweepAmount, primaryAccountId, primaryAccoun
         id: `sweep-${Date.now()}`,
         type: 'sweep',
         date: new Date().toISOString(),
-        title: 'Initial deployment to Neev Reserve',
-        amount: sweepAmount,
-        status: 'completed',
-        via: 'Initial deployment',
+        data: { product: 'reserve', amount: sweepAmount, status: 'completed' },
       },
     },
     {
@@ -52,8 +49,8 @@ export function getDeployDispatches(sweepAmount, primaryAccountId, primaryAccoun
       },
     },
     {
-      type: 'SET_LIFECYCLE',
-      payload: 'active',
+      type: 'COMPLETE_ONBOARDING',
+      payload: { lifecycle: 'active' },
     },
   ];
 }

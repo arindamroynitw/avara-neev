@@ -119,7 +119,10 @@ export default function CommitmentStep() {
 
       <div style={{ flex: 1, background: colors.light, padding: '20px', paddingBottom: '40px', overflowY: 'auto' }}>
         {/* Phone */}
-        <VerificationStep label="Phone Number" status={substep === 'phone' ? 'pending' : verifying && substep === 'phone' ? 'verifying' : 'verified'}>
+        <VerificationStep
+          label={['pan', 'aa', 'aaOtp', 'aaDiscovery', 'done'].includes(substep) && phone ? `+91 ${phone.slice(0,5)} ${phone.slice(5)}` : 'Phone Number'}
+          status={substep === 'phone' ? 'pending' : substep === 'otp' ? 'verifying' : 'verified'}
+        >
           <div style={{ display: 'flex', gap: '8px' }}>
             <span style={{ fontFamily: fonts.sans, fontSize: '0.875rem', color: colors.muted, padding: '10px 0' }}>+91</span>
             <input type="tel" value={phone} onChange={e => setPhone(e.target.value.replace(/[^0-9]/g, '').slice(0, 10))} placeholder="98765 43210" style={inputStyle} />

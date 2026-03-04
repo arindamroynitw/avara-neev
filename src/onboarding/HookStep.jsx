@@ -10,10 +10,15 @@ export default function HookStep() {
   const [amount, setAmount] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [textDone, setTextDone] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = useCallback(() => {
     const parsed = parseInt(amount.replace(/[^0-9]/g, ''), 10);
-    if (!parsed || parsed < 10000) return;
+    if (!parsed || parsed < 10000) {
+      setError('Enter at least ₹10,000 to see your potential');
+      return;
+    }
+    setError('');
     dispatch({ type: 'SET_HOOK_DATA', payload: { idleCashAmount: parsed } });
     setSubmitted(true);
   }, [amount, dispatch]);
@@ -80,7 +85,13 @@ export default function HookStep() {
                   value={amount}
                   onChange={e => {
                     const raw = e.target.value.replace(/[^0-9]/g, '');
-                    if (raw.length <= 8) setAmount(raw);
+                    if (raw.length <= 8) { setAmount(raw); setError(''); }
+                  }}
+                  onBlur={() => {
+                    const parsed = parseInt(amount.replace(/[^0-9]/g, ''), 10);
+                    if (amount && (!parsed || parsed < 10000)) {
+                      setError('Enter at least ₹10,000 to see your potential');
+                    }
                   }}
                   placeholder="6,00,000"
                   autoFocus
@@ -96,6 +107,12 @@ export default function HookStep() {
                   }}
                 />
               </div>
+
+              {error && (
+                <div style={{ fontFamily: fonts.sans, fontSize: '0.75rem', color: colors.error, marginBottom: '12px', paddingLeft: '4px' }}>
+                  {error}
+                </div>
+              )}
 
               <button
                 onClick={handleSubmit}

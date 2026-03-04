@@ -173,7 +173,7 @@ export default function PictureStep() {
               <div style={{ fontFamily: fonts.sans, fontSize: '0.75rem', color: colors.muted, marginBottom: '10px' }}>
                 {currentField.helper}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${colors.bone}`, borderRadius: '8px', padding: '10px 14px', marginBottom: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', border: `1px solid ${colors.bone}`, borderRadius: '8px', padding: '10px 14px', marginBottom: outflows[currentField.key] ? '4px' : '12px' }}>
                 <span style={{ color: colors.muted, fontSize: '0.9375rem', marginRight: '6px' }}>₹</span>
                 <input
                   type="text" inputMode="numeric"
@@ -184,6 +184,11 @@ export default function PictureStep() {
                   style={{ flex: 1, fontFamily: fonts.sans, fontSize: '1rem', color: colors.dark, border: 'none', outline: 'none', background: 'none' }}
                 />
               </div>
+              {outflows[currentField.key] ? (
+                <div style={{ fontFamily: fonts.sans, fontSize: '0.75rem', color: colors.muted, marginBottom: '12px', paddingLeft: '4px' }}>
+                  ₹{(parseInt(outflows[currentField.key]) || 0).toLocaleString('en-IN')}/month
+                </div>
+              ) : null}
             </div>
 
             {/* Outflow progress dots */}

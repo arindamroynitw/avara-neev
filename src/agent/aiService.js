@@ -56,7 +56,12 @@ function parseCardsFromText(text) {
  * Call OpenAI via Vercel AI SDK and parse response into cards.
  */
 export async function callAI(userMessage, conversationHistory, state) {
-  const openai = getOpenAI();
+  let openai;
+  try {
+    openai = getOpenAI();
+  } catch (e) {
+    return { cards: [{ type: 'agent-text', props: { text: 'AI chat is unavailable in demo mode.' } }] };
+  }
 
   const messages = [
     ...conversationHistory.slice(-8),
@@ -78,8 +83,8 @@ export async function callAI(userMessage, conversationHistory, state) {
     const cards = parseCardsFromText(cleaned);
     return { cards };
   } catch (error) {
-    if (error.message?.includes('VITE_OPENAI_API_KEY')) {
-      throw error;
+    if (error.message?.includes('VITE_OPENAI_API_KEY') || error.message?.includes('Set VITE_OPENAI_API_KEY')) {
+      return { cards: [{ type: 'agent-text', props: { text: 'AI chat is unavailable in demo mode. Set VITE_OPENAI_API_KEY to enable it.' } }] };
     }
 
     // Retry once on rate limit or server error

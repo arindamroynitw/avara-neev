@@ -4,10 +4,18 @@ import { colors, fonts, easing } from '../../styles/tokens';
 export default function ShowWorkToggle({ children }) {
   const [open, setOpen] = useState(false);
 
+  const handleToggle = () => {
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }), 50);
+    }
+  };
+
   return (
     <div style={{ marginTop: '12px' }}>
       <button
-        onClick={() => setOpen(!open)}
+        onClick={handleToggle}
         style={{
           fontFamily: fonts.sans,
           fontSize: '0.75rem',

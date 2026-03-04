@@ -4,6 +4,21 @@ import { useApp } from '../../context/AppContext';
 import { formatCompact } from '../../utils/format';
 import ActivityFeed from './ActivityFeed';
 
+class ActivityFeedErrorBoundary extends React.Component {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '20px', textAlign: 'center', fontFamily: fonts.sans, fontSize: '0.8125rem', color: colors.muted }}>
+          Unable to load activity. Try refreshing.
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 export default function ActivitySurface() {
   const { state } = useApp();
   const { activityFeed, metrics } = state;
@@ -60,7 +75,9 @@ export default function ActivitySurface() {
       </div>
 
       {/* Feed */}
-      <ActivityFeed transactions={activityFeed} />
+      <ActivityFeedErrorBoundary>
+        <ActivityFeed transactions={activityFeed} />
+      </ActivityFeedErrorBoundary>
     </div>
   );
 }

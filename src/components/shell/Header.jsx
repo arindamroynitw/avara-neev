@@ -3,7 +3,7 @@ import { colors, typography, grainTexture } from '../../styles/tokens';
 import { useApp } from '../../context/AppContext';
 
 export default function Header() {
-  const { dispatch } = useApp();
+  const { dispatch, showToast } = useApp();
   const pressTimer = useRef(null);
 
   const handlePressStart = useCallback(() => {
@@ -73,6 +73,7 @@ export default function Header() {
         </div>
 
         <div
+          onClick={() => showToast('Notifications coming soon')}
           style={{
             width: '36px',
             height: '36px',
@@ -82,6 +83,7 @@ export default function Header() {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            cursor: 'pointer',
           }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={colors.gold} strokeWidth="1.5">

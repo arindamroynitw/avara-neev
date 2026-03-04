@@ -29,7 +29,7 @@ export default function HeroSection() {
   return (
     <div style={{
       background: colors.dark,
-      padding: '0 20px 32px',
+      padding: '16px 20px 32px',
       position: 'relative',
       ...grainTexture,
     }}>

@@ -19,7 +19,7 @@ const productNames = {
 };
 
 export default function TransactionItem({ transaction }) {
-  const { type, date, data } = transaction;
+  const { type, date, data = {} } = transaction;
   const config = typeConfig[type] || typeConfig.sweep;
 
   const formatDate = (d) => {

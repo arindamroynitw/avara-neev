@@ -115,12 +115,19 @@ export function reducer(state, action) {
         onboarding: { ...state.onboarding, commitmentData: { ...state.onboarding.commitmentData, ...action.payload } },
       };
 
-    case 'COMPLETE_ONBOARDING':
+    case 'COMPLETE_ONBOARDING': {
+      const pd = state.onboarding.pictureData || {};
+      const breakdown = pd.outflowBreakdown || {};
+      const computedOutflows = (breakdown.rent || 0) + (breakdown.sips || 0) + (breakdown.emi || 0) + (breakdown.other || 0);
+      // Use outflowBreakdown sum if available, else fall back to pictureData.outflows total
+      const derivedOutflows = computedOutflows || pd.outflows || state.user.outflows;
       return {
         ...state,
         lifecycle: action.payload?.lifecycle ?? 'zero-state',
         onboarding: { ...state.onboarding, completed: true, currentStep: 'done' },
+        user: { ...state.user, outflows: derivedOutflows || state.user.outflows },
       };
+    }
 
     // --- Lifecycle ---
     case 'SET_LIFECYCLE':
@@ -287,6 +294,15 @@ export function reducer(state, action) {
           newTotalBalance += p.balance;
         }
       });
+      // Calculate weighted average yield for relative earnings formula
+      let weightedYieldSum = 0;
+      Object.keys(newProducts).forEach(key => {
+        const p = newProducts[key];
+        if (p.active && p.balance > 0) weightedYieldSum += p.yield * p.balance;
+      });
+      const avgYield = newTotalBalance > 0 ? weightedYieldSum / newTotalBalance : 7.2;
+      const newMonthsActive = state.metrics.monthsActive + 1;
+
       return {
         ...state,
         products: newProducts,
@@ -294,15 +310,15 @@ export function reducer(state, action) {
           ...state.metrics,
           totalNeevBalance: newTotalBalance,
           extraEarned: state.metrics.extraEarned + totalExtra,
-          extraEarnedToday: Math.round(newTotalBalance * 0.037 / 365),
-          monthsActive: 1,
+          extraEarnedToday: Math.round(newTotalBalance * (avgYield - 3.5) / 100 / 365),
+          monthsActive: newMonthsActive,
         },
         agentCards: [
           {
             id: `sim-milestone-${Date.now()}`,
             type: 'milestone',
             props: {
-              message: `After 1 month, your investments have grown. You've earned ₹${totalExtra.toLocaleString('en-IN')} extra over what a savings account would give.`,
+              message: `After ${newMonthsActive} month${newMonthsActive > 1 ? 's' : ''}, your investments have grown. You've earned ₹${totalExtra.toLocaleString('en-IN')} extra over what a savings account would give.`,
               goldMetric: `+₹${totalExtra.toLocaleString('en-IN')} extra`,
             },
             dismissed: false,
@@ -315,9 +331,7 @@ export function reducer(state, action) {
             id: `sim-yield-${Date.now()}`,
             type: 'yield',
             date: new Date().toISOString(),
-            title: 'Monthly yield accrual',
-            amount: totalExtra,
-            status: 'completed',
+            data: { product: 'reserve', amount: totalExtra, status: 'completed' },
           },
           ...state.activityFeed,
         ],
