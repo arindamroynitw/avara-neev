@@ -29,9 +29,9 @@ export const initialState = {
 
   products: {
     reserve: { active: false, balance: 0, yield: 7.2, dailyEarnings: 0, allocation: { liquid: 0.2, arbitrage: 0.8 } },
-    marketEntry: { active: false, unlocked: false, balance: 0, yield: 10.53, fund: 'UTI Nifty 50 Index Fund', currentPE: 19.5, peZone: 'fair', deploymentPace: 1.0, stpProgress: 0 },
-    accelerate: { active: false, unlocked: false, balance: 0, yield: 14.2, funds: [], lastRebalance: null },
-    navigate: { active: false, unlocked: false, balance: 0, yield: 13.66, funds: [], lastRebalance: null },
+    marketEntry: { active: false, balance: 0, yield: 10.53, fund: 'UTI Nifty 50 Index Fund', currentPE: 19.5, peZone: 'fair', deploymentPace: 1.0, stpProgress: 0 },
+    accelerate: { active: false, balance: 0, yield: 14.2, funds: [], lastRebalance: null },
+    navigate: { active: false, balance: 0, yield: 13.66, funds: [], lastRebalance: null },
   },
 
   metrics: {

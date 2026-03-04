@@ -27,11 +27,9 @@ export default function ProductList() {
           const def = productDefinitions[key];
           if (!product || !def) return null;
           const isActive = product.active;
-          const isUnlocked = product.unlocked !== false; // reserve has no unlocked field (always available)
-          const isLocked = !isActive && !isUnlocked;
 
           return (
-            <Card key={key} animate delay={i * 80} style={isLocked ? { opacity: 0.5 } : {}}>
+            <Card key={key} animate delay={i * 80}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                   <div style={{
@@ -47,7 +45,7 @@ export default function ProductList() {
                   </div>
                 </div>
                 <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                  <div style={{ fontFamily: fonts.sans, fontSize: '0.875rem', fontWeight: 600, color: isLocked ? colors.muted : colors.success }}>
+                  <div style={{ fontFamily: fonts.sans, fontSize: '0.875rem', fontWeight: 600, color: colors.success }}>
                     {formatPercent(def.yield)}
                   </div>
                   <span style={{
@@ -57,7 +55,7 @@ export default function ProductList() {
                     background: isActive ? 'rgba(76,175,80,0.1)' : colors.boneLight,
                     padding: '3px 8px', borderRadius: '4px',
                   }}>
-                    {isActive ? 'ACTIVE' : isLocked ? 'LOCKED' : 'AVAILABLE'}
+                    {isActive ? 'ACTIVE' : ''}
                   </span>
                 </div>
               </div>
@@ -102,7 +100,7 @@ export default function ProductList() {
               )}
 
               {/* Available: dual CTAs */}
-              {!isActive && isUnlocked && (
+              {!isActive && (
                 <div style={{ display: 'flex', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${colors.boneLight}` }}>
                   <button
                     onClick={() => dispatch({ type: 'SET_PROGRAM_PREVIEW', payload: key })}
@@ -130,11 +128,11 @@ export default function ProductList() {
                 </div>
               )}
 
-              {/* Locked: unlock hint */}
-              {isLocked && (
-                <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${colors.boneLight}` }}>
-                  <span style={{ fontFamily: fonts.sans, fontSize: '0.6875rem', color: colors.muted }}>
-                    Unlock after ₹2L in Neev Reserve
+              {/* Soft recommendation when Reserve not yet active */}
+              {!isActive && key !== 'reserve' && !products.reserve.active && (
+                <div style={{ marginTop: '8px' }}>
+                  <span style={{ fontFamily: fonts.sans, fontSize: '0.625rem', color: colors.muted, fontStyle: 'italic' }}>
+                    We recommend starting with Neev Reserve
                   </span>
                 </div>
               )}

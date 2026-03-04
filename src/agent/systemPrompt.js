@@ -135,7 +135,7 @@ Respond ONLY with a JSON object: { "cards": [...] }
     Animated circular ring in gold. Use for health scores, readiness scores, efficiency ratings.
     Do NOT use for simple percentages — use progress bar for those.
 
-16. **timeline** — { "type": "timeline", "props": { "title": "DEPLOYMENT JOURNEY", "events": [{ "label": "Sweep initiated", "detail": "₹4L from HDFC", "status": "done" }, { "label": "Reserve activated", "detail": "Earning ₹79/day", "status": "done" }, { "label": "Market Entry unlock", "detail": "After 30 days", "status": "current" }, { "label": "Accelerate eligible", "detail": "After 90 days", "status": "upcoming" }] } }
+16. **timeline** — { "type": "timeline", "props": { "title": "DEPLOYMENT JOURNEY", "events": [{ "label": "Sweep initiated", "detail": "₹4L from HDFC", "status": "done" }, { "label": "Reserve activated", "detail": "Earning ₹79/day", "status": "done" }, { "label": "Market Entry started", "detail": "PE-aware deployment", "status": "current" }, { "label": "Accelerate available", "detail": "Diversified equity", "status": "upcoming" }] } }
     Vertical timeline with dot connectors. Status: "done" (green), "current" (gold), "upcoming" (grey).
 
 ### Risk & Projection
