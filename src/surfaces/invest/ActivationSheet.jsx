@@ -9,7 +9,8 @@ import { delays } from '../../utils/mockDelays';
 export default function ActivationSheet({ productKey, onClose }) {
   const { state, dispatch } = useApp();
   const def = productDefinitions[productKey];
-  const [amount, setAmount] = useState(def.minInvestment);
+  const [inputValue, setInputValue] = useState(String(def.minInvestment));
+  const amount = parseInt(inputValue) || 0;
   const [phase, setPhase] = useState('input'); // input | processing | done
   const [stages, setStages] = useState([]);
 
@@ -129,22 +130,22 @@ export default function ActivationSheet({ productKey, onClose }) {
               }}>
                 <span style={{ fontFamily: fonts.sans, fontSize: '1rem', color: colors.muted }}>₹</span>
                 <input
-                  type="number"
-                  value={amount}
+                  type="text"
+                  inputMode="numeric"
+                  value={inputValue}
                   onChange={e => {
-                    const val = parseInt(e.target.value) || 0;
-                    setAmount(Math.min(val, maxAmount));
+                    const cleaned = e.target.value.replace(/[^0-9]/g, '');
+                    setInputValue(cleaned);
                   }}
-                  min={def.minInvestment}
-                  max={maxAmount}
                   style={{
                     flex: 1, fontFamily: fonts.sans, fontSize: '1rem', fontWeight: 600,
                     color: colors.dark, border: 'none', outline: 'none', background: 'none',
                   }}
                 />
               </div>
-              <div style={{ fontFamily: fonts.sans, fontSize: '0.625rem', color: colors.muted, marginTop: '4px' }}>
-                Min {formatINR(def.minInvestment)}
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: fonts.sans, fontSize: '0.625rem', color: amount > maxAmount ? colors.error : colors.muted, marginTop: '4px' }}>
+                <span>Min {formatINR(def.minInvestment)}</span>
+                <span>Available {formatINR(maxAmount)}</span>
               </div>
             </div>
 
@@ -153,7 +154,7 @@ export default function ActivationSheet({ productKey, onClose }) {
               {quickAmounts.map(a => (
                 <button
                   key={a}
-                  onClick={() => setAmount(a)}
+                  onClick={() => setInputValue(String(a))}
                   style={{
                     fontFamily: fonts.sans, fontSize: '0.6875rem', fontWeight: 600,
                     color: amount === a ? colors.gold : colors.dark,

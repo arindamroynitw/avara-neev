@@ -187,10 +187,10 @@ export default function ProductDetail({ productKey }) {
 
       {/* Action bar */}
       <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-        <Button variant="outline" onClick={() => showToast('Withdrawal flow coming soon')} style={{ flex: 1 }}>
+        <Button variant="outline" onClick={() => dispatch({ type: 'LAUNCH_FLOW', payload: { flow: 'withdraw', params: { product: productKey } } })} style={{ flex: 1 }}>
           Withdraw
         </Button>
-        <Button variant="primary" onClick={() => showToast('Additional investment coming soon')} style={{ flex: 1 }}>
+        <Button variant="primary" onClick={() => dispatch({ type: 'LAUNCH_FLOW', payload: { flow: 'deploy', params: { product: productKey } } })} style={{ flex: 1 }}>
           Add More
         </Button>
       </div>
