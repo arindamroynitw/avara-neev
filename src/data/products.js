@@ -80,10 +80,10 @@ export const productDefinitions = {
 export const FUND_LOGOS = {
   'Kotak': '/logos/kotak.png',
   'Parag Parikh': '/logos/ppfas.png',
-  'UTI': 'https://logo.clearbit.com/utimf.com',
-  'ICICI': 'https://logo.clearbit.com/icicipruamc.com',
-  'HDFC': 'https://logo.clearbit.com/hdfcfund.com',
-  'Motilal Oswal': 'https://logo.clearbit.com/motilaloswalmf.com',
+  'UTI': '/logos/uti.jpg',
+  'ICICI': '/logos/icici.jpeg',
+  'HDFC': '/logos/hdfc.jpg',
+  'Motilal Oswal': '/logos/motilal.png',
 };
 
 export function getFundLogo(fundName) {
