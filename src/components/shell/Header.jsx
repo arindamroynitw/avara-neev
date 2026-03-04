@@ -1,23 +1,9 @@
-import React, { useRef, useCallback } from 'react';
+import React from 'react';
 import { colors, typography, grainTexture } from '../../styles/tokens';
 import { useApp } from '../../context/AppContext';
 
 export default function Header() {
-  const { dispatch, showToast } = useApp();
-  const pressTimer = useRef(null);
-
-  const handlePressStart = useCallback(() => {
-    pressTimer.current = setTimeout(() => {
-      dispatch({ type: 'TOGGLE_DEMO_PANEL' });
-    }, 3000);
-  }, [dispatch]);
-
-  const handlePressEnd = useCallback(() => {
-    if (pressTimer.current) {
-      clearTimeout(pressTimer.current);
-      pressTimer.current = null;
-    }
-  }, []);
+  const { dispatch } = useApp();
 
   return (
     <div
@@ -57,15 +43,9 @@ export default function Header() {
         }}
       >
         <div
-          onMouseDown={handlePressStart}
-          onMouseUp={handlePressEnd}
-          onMouseLeave={handlePressEnd}
-          onTouchStart={handlePressStart}
-          onTouchEnd={handlePressEnd}
           style={{
             ...typography.brandMark,
             color: colors.light,
-            cursor: 'default',
             userSelect: 'none',
           }}
         >
@@ -73,7 +53,7 @@ export default function Header() {
         </div>
 
         <div
-          onClick={() => showToast('Notifications coming soon')}
+          onClick={() => dispatch({ type: 'TOGGLE_DEMO_PANEL' })}
           style={{
             width: '36px',
             height: '36px',

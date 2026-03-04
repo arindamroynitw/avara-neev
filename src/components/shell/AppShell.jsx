@@ -4,14 +4,16 @@ import { useApp } from '../../context/AppContext';
 import Header from './Header';
 import TabBar from './TabBar';
 import InputBar from './InputBar';
-import ConversationOverlay from './ConversationOverlay';
+import SurfaceResponseView from './SurfaceResponseView';
+import RMChatView from './RMChatView';
 import DeployNowOverlay from './DeployNowOverlay';
+import FlowOverlay from '../../flows/FlowOverlay';
 import Toast from '../shared/Toast';
 
 export default function AppShell({ children }) {
   const { state } = useApp();
-  const conversationOpen = state.conversation.open;
   const showChrome = state.onboarding.completed;
+  const surfaceActive = state.surfaceResponse.active;
 
   return (
     <div
@@ -38,12 +40,13 @@ export default function AppShell({ children }) {
           msOverflowStyle: 'none',
         }}
       >
-        {children}
+        {surfaceActive ? <SurfaceResponseView /> : children}
       </div>
-      {showChrome && !conversationOpen && <InputBar />}
-      {showChrome && <TabBar receded={conversationOpen} />}
-      <ConversationOverlay />
+      {showChrome && !state.rmChat.open && <InputBar />}
+      {showChrome && <TabBar />}
+      {state.rmChat.open && <RMChatView />}
       {state.deployNow?.active && <DeployNowOverlay />}
+      {state.activeFlow && <FlowOverlay />}
       <Toast />
     </div>
   );

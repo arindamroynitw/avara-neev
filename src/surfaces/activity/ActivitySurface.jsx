@@ -3,6 +3,7 @@ import { colors, fonts, typography, goldGradient } from '../../styles/tokens';
 import { useApp } from '../../context/AppContext';
 import { formatCompact } from '../../utils/format';
 import ActivityFeed from './ActivityFeed';
+import RMChatCTA from '../../components/shared/RMChatCTA';
 
 class ActivityFeedErrorBoundary extends React.Component {
   state = { hasError: false };
@@ -34,8 +35,11 @@ export default function ActivitySurface() {
         }}>
           ACTIVITY
         </div>
-        <div style={{ ...typography.displayMedium, color: colors.dark, marginBottom: '12px' }}>
-          Transaction History
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '12px' }}>
+          <div style={{ ...typography.displayMedium, color: colors.dark }}>
+            Transaction History
+          </div>
+          <RMChatCTA text="Questions?" context={{ source: 'activity' }} style={{ fontSize: '0.75rem' }} />
         </div>
 
         {/* Summary strip */}

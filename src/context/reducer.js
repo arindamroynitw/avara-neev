@@ -46,7 +46,26 @@ export const initialState = {
   agentCards: [],
   activityFeed: [],
 
-  conversation: { open: false, thread: [], loading: false, error: null, context: null },
+  surfaceResponse: {
+    active: false,
+    previousTab: null,
+    hiddenThread: [],
+    currentCards: [],
+    quickReplies: [],
+    turnCount: 0,
+    context: null,
+    loading: false,
+    error: null,
+  },
+  activeFlow: null,
+  rmChat: {
+    open: false,
+    thread: [],
+    loading: false,
+    error: null,
+    entryContext: null,
+    lastOpenedAt: null,
+  },
   activeTab: 'home',
   activeProductDetail: null,
   activeProgramPreview: null,
@@ -60,7 +79,16 @@ export function reducer(state, action) {
   switch (action.type) {
     // --- Navigation ---
     case 'SET_TAB':
-      return { ...state, activeTab: action.payload, activeProductDetail: null, activeProgramPreview: null };
+      return {
+        ...state,
+        activeTab: action.payload,
+        activeProductDetail: null,
+        activeProgramPreview: null,
+        surfaceResponse: state.surfaceResponse.active
+          ? { ...initialState.surfaceResponse }
+          : state.surfaceResponse,
+        rmChat: state.rmChat.open ? { ...state.rmChat, open: false } : state.rmChat,
+      };
 
     case 'SET_PRODUCT_DETAIL':
       return { ...state, activeProductDetail: action.payload };
@@ -191,44 +219,161 @@ export function reducer(state, action) {
     case 'SET_ACTIVITY_FEED':
       return { ...state, activityFeed: action.payload };
 
-    // --- Conversation ---
-    case 'OPEN_CONVERSATION':
+    // --- Surface Response ---
+    case 'ENTER_SURFACE_RESPONSE':
       return {
         ...state,
-        conversation: { ...state.conversation, open: true },
+        surfaceResponse: {
+          ...initialState.surfaceResponse,
+          active: true,
+          previousTab: action.payload?.previousTab || state.activeTab,
+          context: action.payload?.context || null,
+        },
+        activeProductDetail: null,
+        activeProgramPreview: null,
       };
 
-    case 'CLOSE_CONVERSATION':
+    case 'EXIT_SURFACE_RESPONSE':
       return {
         ...state,
-        conversation: { ...state.conversation, open: false, context: null },
+        activeTab: state.surfaceResponse.previousTab || state.activeTab,
+        surfaceResponse: { ...initialState.surfaceResponse },
       };
 
-    case 'SET_CONVERSATION_CONTEXT':
+    case 'SET_SURFACE_CARDS':
       return {
         ...state,
-        conversation: { ...state.conversation, context: action.payload },
-      };
-
-    case 'ADD_MESSAGE':
-      return {
-        ...state,
-        conversation: {
-          ...state.conversation,
-          thread: [...state.conversation.thread, action.payload],
+        surfaceResponse: {
+          ...state.surfaceResponse,
+          currentCards: action.payload.cards,
+          quickReplies: action.payload.quickReplies || [],
+          turnCount: state.surfaceResponse.turnCount + 1,
+          loading: false,
+          error: null,
         },
       };
 
-    case 'SET_CONVERSATION_LOADING':
+    case 'ADD_SURFACE_MESSAGE':
       return {
         ...state,
-        conversation: { ...state.conversation, loading: action.payload },
+        surfaceResponse: {
+          ...state.surfaceResponse,
+          hiddenThread: [
+            ...state.surfaceResponse.hiddenThread,
+            { role: action.payload.role, content: action.payload.content, timestamp: action.payload.timestamp },
+          ],
+        },
       };
 
-    case 'SET_CONVERSATION_ERROR':
+    case 'SET_SURFACE_LOADING':
       return {
         ...state,
-        conversation: { ...state.conversation, error: action.payload, loading: false },
+        surfaceResponse: { ...state.surfaceResponse, loading: action.payload },
+      };
+
+    case 'SET_SURFACE_ERROR':
+      return {
+        ...state,
+        surfaceResponse: { ...state.surfaceResponse, error: action.payload, loading: false },
+      };
+
+    case 'CLEAR_SURFACE_SESSION':
+      return {
+        ...state,
+        surfaceResponse: {
+          ...state.surfaceResponse,
+          hiddenThread: [],
+          turnCount: 0,
+          context: null,
+          currentCards: [],
+          quickReplies: [],
+        },
+      };
+
+    // --- RM Chat ---
+    case 'OPEN_RM_CHAT': {
+      const newState = {
+        ...state,
+        rmChat: {
+          ...state.rmChat,
+          open: true,
+          entryContext: action.payload?.context || null,
+          lastOpenedAt: Date.now(),
+        },
+      };
+      // Auto-exit Surface Response (strict exclusivity)
+      if (state.surfaceResponse.active) {
+        // Optionally carry SR thread as prior context
+        if (action.payload?.priorContext && state.surfaceResponse.hiddenThread.length > 0) {
+          const summaryMsg = {
+            id: `sr-context-${Date.now()}`,
+            role: 'assistant',
+            content: [{ type: 'agent-text', props: { text: `[Prior conversation context carried over]` } }],
+            timestamp: Date.now(),
+          };
+          newState.rmChat.thread = [...newState.rmChat.thread, summaryMsg];
+        }
+        newState.surfaceResponse = { ...initialState.surfaceResponse };
+      }
+      return newState;
+    }
+
+    case 'CLOSE_RM_CHAT':
+      return {
+        ...state,
+        rmChat: { ...state.rmChat, open: false },
+      };
+
+    case 'ADD_RM_MESSAGE':
+      return {
+        ...state,
+        rmChat: {
+          ...state.rmChat,
+          thread: [
+            ...state.rmChat.thread,
+            {
+              id: action.payload.id || `rm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+              role: action.payload.role,
+              content: action.payload.content,
+              timestamp: action.payload.timestamp || Date.now(),
+              context: action.payload.context || null,
+            },
+          ],
+        },
+      };
+
+    case 'SET_RM_LOADING':
+      return {
+        ...state,
+        rmChat: { ...state.rmChat, loading: action.payload },
+      };
+
+    case 'SET_RM_ERROR':
+      return {
+        ...state,
+        rmChat: { ...state.rmChat, error: action.payload, loading: false },
+      };
+
+    case 'CLEAR_RM_THREAD':
+      return {
+        ...state,
+        rmChat: { ...state.rmChat, thread: [] },
+      };
+
+    // --- Flows ---
+    case 'LAUNCH_FLOW':
+      return {
+        ...state,
+        activeFlow: { flow: action.payload.flow, params: action.payload.params || {} },
+        surfaceResponse: state.surfaceResponse.active ? { ...initialState.surfaceResponse } : state.surfaceResponse,
+        rmChat: state.rmChat.open ? { ...state.rmChat, open: false } : state.rmChat,
+      };
+
+    case 'CLOSE_FLOW':
+      return {
+        ...state,
+        activeFlow: null,
+        activeTab: 'home',
       };
 
     // --- Sweep ---
@@ -250,7 +395,7 @@ export function reducer(state, action) {
 
     // --- Load full snapshot (for demo time-travel) ---
     case 'LOAD_SNAPSHOT':
-      return { ...action.payload, demo: state.demo };
+      return { ...action.payload, demo: state.demo, surfaceResponse: initialState.surfaceResponse, activeFlow: null, rmChat: initialState.rmChat };
 
     // --- Toast ---
     case 'SHOW_TOAST':

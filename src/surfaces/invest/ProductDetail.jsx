@@ -11,6 +11,7 @@ import { colors, typography, goldGradient, fonts, easing } from '../../styles/to
 import { useApp } from '../../context/AppContext';
 import { formatCompact, formatPercent } from '../../utils/format';
 import { productDefinitions } from '../../data/products';
+import RMChatCTA from '../../components/shared/RMChatCTA';
 
 const productIcons = { reserve: '🛡️', marketEntry: '📈', accelerate: '🚀', navigate: '🧭' };
 
@@ -181,20 +182,7 @@ export default function ProductDetail({ productKey }) {
         <div style={{ fontFamily: fonts.sans, fontSize: '0.75rem', color: colors.muted, marginBottom: '8px' }}>
           Questions about this fund?
         </div>
-        <button
-          onClick={() => {
-            dispatch({ type: 'SET_CONVERSATION_CONTEXT', payload: { product: productKey } });
-            dispatch({ type: 'OPEN_CONVERSATION' });
-          }}
-          style={{
-            fontFamily: fonts.sans, fontSize: '0.6875rem', fontWeight: 600,
-            color: colors.gold, background: colors.dark,
-            padding: '8px 16px', borderRadius: '8px',
-            border: `1px solid rgba(212,175,55,0.2)`, cursor: 'pointer',
-          }}
-        >
-          Chat about {def.name} →
-        </button>
+        <RMChatCTA text={`Discuss ${def.name} with your RM →`} context={{ product: productKey, source: 'product-detail' }} />
       </Card>
 
       {/* Action bar */}

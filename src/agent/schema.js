@@ -67,6 +67,39 @@ export const cardTypes = {
   'score': {
     requiredProps: ['value', 'label'],
   },
+  'quick-replies': {
+    requiredProps: ['chips'],
+  },
+  'choice-card': {
+    requiredProps: ['options'],
+  },
+  'amount-input': {
+    requiredProps: ['title'],
+  },
+  'toggle-choice': {
+    requiredProps: ['optionA', 'optionB'],
+  },
+  'expandable-card': {
+    requiredProps: ['title'],
+  },
+  'scrollable-feed': {
+    requiredProps: ['items'],
+  },
+  'confirmation-card': {
+    requiredProps: ['title', 'items'],
+  },
+  'flow-launcher': {
+    requiredProps: ['flow'],
+  },
+  'navigate-card': {
+    requiredProps: ['title', 'destination'],
+  },
+  'escalate-to-rm': {
+    requiredProps: ['message'],
+  },
+  'session-summary': {
+    requiredProps: ['points'],
+  },
 };
 
 export function validateCard(card) {

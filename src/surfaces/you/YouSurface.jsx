@@ -6,6 +6,7 @@ import ConnectedAccounts from './ConnectedAccounts';
 import AboutMe from './AboutMe';
 import Preferences from './Preferences';
 import VaultSection from './VaultSection';
+import RMChatCTA from '../../components/shared/RMChatCTA';
 
 export default function YouSurface() {
   const { state, dispatch } = useApp();
@@ -22,6 +23,23 @@ export default function YouSurface() {
       <Preferences user={user} />
 
       <VaultSection />
+
+      {/* RM Chat & Clear */}
+      <div style={{ padding: '0 20px', marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <RMChatCTA text="Talk to your RM" context={{ source: 'you-tab' }} />
+        {state.rmChat?.thread?.length > 0 && (
+          <button
+            onClick={() => dispatch({ type: 'CLEAR_RM_THREAD' })}
+            style={{
+              fontFamily: fonts.sans, fontSize: '0.75rem', color: colors.muted,
+              background: 'none', border: 'none', cursor: 'pointer',
+              textDecoration: 'underline', textUnderlineOffset: '3px',
+            }}
+          >
+            Clear chat history
+          </button>
+        )}
+      </div>
 
       {/* Simulate time advance */}
       {(state.lifecycle === 'active' || state.lifecycle === 'mature') && (

@@ -24,8 +24,7 @@ export default function ProgramPreview({ productKey }) {
   const handleBack = () => dispatch({ type: 'CLOSE_PROGRAM_PREVIEW' });
 
   const handleChat = () => {
-    dispatch({ type: 'SET_CONVERSATION_CONTEXT', payload: { product: productKey } });
-    dispatch({ type: 'OPEN_CONVERSATION' });
+    dispatch({ type: 'OPEN_RM_CHAT', payload: { context: { product: productKey, source: 'program-preview' } } });
   };
 
   return (

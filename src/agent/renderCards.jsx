@@ -5,6 +5,16 @@ import GoldDonut from '../components/viz/GoldDonut';
 import { colors, fonts, typography } from '../styles/tokens';
 import { formatINR, formatCompact, formatPercent } from '../utils/format';
 import { calculateDailyEarnings } from '../utils/calculations';
+import ChoiceCard from '../cards/ChoiceCard';
+import AmountInputCard from '../cards/AmountInputCard';
+import ToggleChoiceCard from '../cards/ToggleChoiceCard';
+import ExpandableCard from '../cards/ExpandableCard';
+import ScrollableFeedCard from '../cards/ScrollableFeedCard';
+import ConfirmationCard from '../cards/ConfirmationCard';
+import FlowLauncherCard from '../cards/FlowLauncherCard';
+import NavigateCard from '../cards/NavigateCard';
+import EscalateToRMCard from '../cards/EscalateToRMCard';
+import SessionSummaryCard from '../cards/SessionSummaryCard';
 
 function AgentTextCard({ text }) {
   return (
@@ -324,16 +334,17 @@ function ListCard({ items, title, style: listStyle = 'bullet' }) {
 }
 
 const ALLOWED_BUTTON_ACTIONS = [
-  'SET_TAB', 'SET_PRODUCT_DETAIL', 'SET_PROGRAM_PREVIEW', 'CLOSE_CONVERSATION', 'START_DEPLOY_NOW',
+  'SET_TAB', 'SET_PRODUCT_DETAIL', 'SET_PROGRAM_PREVIEW', 'START_DEPLOY_NOW',
+  'EXIT_SURFACE_RESPONSE', 'OPEN_RM_CHAT', 'LAUNCH_FLOW', 'SET_PREFERENCE',
 ];
 
 function ButtonCard({ text, action, dispatch }) {
   const handleClick = () => {
     if (!dispatch || !action) return;
     if (!ALLOWED_BUTTON_ACTIONS.includes(action.type)) return;
-    // Close conversation first, then fire the action
-    dispatch({ type: 'CLOSE_CONVERSATION' });
-    if (action.type !== 'CLOSE_CONVERSATION') {
+    // Exit surface response first, then fire the action
+    dispatch({ type: 'EXIT_SURFACE_RESPONSE' });
+    if (action.type !== 'EXIT_SURFACE_RESPONSE') {
       setTimeout(() => dispatch(action), 50);
     }
   };
@@ -517,10 +528,15 @@ function ScoreCard({ value, label, maxValue = 100, subtitle }) {
   );
 }
 
-export function renderCards(cards, dispatch) {
+export function renderCards(cards, dispatch, options = {}) {
   if (!cards || !Array.isArray(cards)) return null;
 
-  return cards.map((card, index) => {
+  const { extractQuickReplies, sendMessage } = options;
+  const filteredCards = extractQuickReplies
+    ? cards.filter(c => c.type !== 'quick-replies')
+    : cards;
+
+  return filteredCards.map((card, index) => {
     const key = `card-${index}`;
     const style = {
       animation: `cardStagger 350ms ${index * 80}ms both`,
@@ -572,6 +588,26 @@ export function renderCards(cards, dispatch) {
         return <div key={key} style={style}><TimelineCard {...card.props} /></div>;
       case 'score':
         return <div key={key} style={style}><ScoreCard {...card.props} /></div>;
+      case 'choice-card':
+        return <div key={key} style={style}><ChoiceCard {...card.props} onSelect={(text) => sendMessage?.(text)} /></div>;
+      case 'amount-input':
+        return <div key={key} style={style}><AmountInputCard {...card.props} onSubmit={(text) => sendMessage?.(text)} /></div>;
+      case 'toggle-choice':
+        return <div key={key} style={style}><ToggleChoiceCard {...card.props} onSelect={(text) => sendMessage?.(text)} /></div>;
+      case 'expandable-card':
+        return <div key={key} style={style}><ExpandableCard {...card.props} dispatch={dispatch} /></div>;
+      case 'scrollable-feed':
+        return <div key={key} style={style}><ScrollableFeedCard {...card.props} /></div>;
+      case 'confirmation-card':
+        return <div key={key} style={style}><ConfirmationCard {...card.props} dispatch={dispatch} onConfirm={(text) => sendMessage?.(text)} onCancel={(text) => sendMessage?.(text)} /></div>;
+      case 'flow-launcher':
+        return <div key={key} style={style}><FlowLauncherCard {...card.props} dispatch={dispatch} /></div>;
+      case 'navigate-card':
+        return <div key={key} style={style}><NavigateCard {...card.props} dispatch={dispatch} /></div>;
+      case 'escalate-to-rm':
+        return <div key={key} style={style}><EscalateToRMCard {...card.props} dispatch={dispatch} /></div>;
+      case 'session-summary':
+        return <div key={key} style={style}><SessionSummaryCard {...card.props} dispatch={dispatch} /></div>;
       default:
         // Fallback: render as text
         return (

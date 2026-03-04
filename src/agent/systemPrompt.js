@@ -1,7 +1,7 @@
 import { formatCompact } from '../utils/format';
 import { productDefinitions } from '../data/products';
 
-export function buildSystemPrompt(state) {
+export function buildSystemPrompt(state, mode = 'surface') {
   const { user, products, metrics, lifecycle } = state;
 
   const activeProducts = Object.entries(products)
@@ -10,7 +10,9 @@ export function buildSystemPrompt(state) {
     .join(', ');
 
   // Context-aware product section
-  const context = state.conversation?.context;
+  const context = mode === 'surface'
+    ? state.surfaceResponse?.context
+    : state.rmChat?.entryContext;
   let productContext = '';
   if (context?.product) {
     const key = context.product;
@@ -161,8 +163,31 @@ Respond ONLY with a JSON object: { "cards": [...] }
     - { "type": "SET_PRODUCT_DETAIL", "payload": "reserve|marketEntry|accelerate|navigate" } — Open product detail
     - { "type": "SET_PROGRAM_PREVIEW", "payload": "marketEntry" } — Open program preview
     - { "type": "START_DEPLOY_NOW" } — Open deploy flow
-    - { "type": "CLOSE_CONVERSATION" } — Close chat
+    - { "type": "EXIT_SURFACE_RESPONSE" } — Exit current view
     Use at the end of responses when there's a clear next step. Do NOT use more than one button per response.
+
+### Interactive Cards
+23. **choice-card** — { "type": "choice-card", "props": { "title": "Which approach?", "options": [{ "label": "Conservative", "value": "conservative", "description": "Lower risk" }, { "label": "Balanced", "value": "balanced", "description": "Medium risk" }] } }
+    Vertical list of tappable options. Use when the user needs to pick from multiple choices. Use at most ONE interactive card per response.
+
+24. **amount-input** — { "type": "amount-input", "props": { "title": "How much to deploy?", "presets": [50000, 100000, 200000], "min": 10000, "max": 2000000, "default": 100000 } }
+    Amount entry with preset pills + slider. Use when asking how much to invest/transfer/withdraw.
+
+25. **toggle-choice** — { "type": "toggle-choice", "props": { "question": "Active or passive?", "optionA": { "label": "Active", "icon": "🚀", "description": "Higher returns" }, "optionB": { "label": "Passive", "icon": "🧭", "description": "Lower fees", "recommended": true } } }
+    Two side-by-side cards. Use for binary A/B decisions.
+
+26. **expandable-card** — { "type": "expandable-card", "props": { "title": "Tax details", "summary": "Equity taxation applies", "detail": "Long-term capital gains above ₹1.25L taxed at 12.5%..." } }
+    Collapsed by default with expand toggle. Use for optional detail the user can dig into.
+
+27. **scrollable-feed** — { "type": "scrollable-feed", "props": { "title": "Recent activity", "maxHeight": 200, "items": [{ "title": "Sweep", "subtitle": "Feb 1", "value": "₹50,000" }] } }
+    Fixed-height scrollable list. Use for long lists of items.
+
+28. **confirmation-card** — { "type": "confirmation-card", "props": { "title": "Confirm deployment", "items": [{ "label": "Amount", "value": "₹1,00,000" }, { "label": "To", "value": "Neev Reserve" }], "confirmText": "Deploy now", "cancelText": "Not now" } }
+    Summary with confirm/cancel buttons. Use for final confirmation before an action. Gold left border.
+
+### Quick Replies
+29. **quick-replies** — { "type": "quick-replies", "props": { "chips": [{ "label": "Tell me more", "input": "Tell me more about this" }, { "label": "Compare options", "input": "Compare my options" }] } }
+    REQUIRED as the LAST card in every response. Include 2-3 contextual next-step suggestions as chips. Each chip has a "label" (displayed text) and "input" (message sent when tapped).
 
 ## Composition Rules
 1. ALWAYS start with agent-text — it's the conversational hook
@@ -176,6 +201,18 @@ Respond ONLY with a JSON object: { "cards": [...] }
 9. When a product is relevant, end with a button to view it
 10. Keep total text (across all agent-text blocks) under 200 words
 
+${mode === 'surface' ? `## Surface Mode Rules
+- Each response must be SELF-CONTAINED — never reference previous messages
+- Include quick-replies as the LAST card in every response with 2-3 contextual suggestions
+- Use 3-6 cards per response (concise, scannable)
+- If the user has asked multiple turns, be aware this is turn ${state.surfaceResponse?.turnCount || 0}
+` : mode === 'rm-chat' ? `## RM Chat Mode Rules
+- You are in a persistent advisory conversation — you MAY reference previous messages
+- Be conversational, ask follow-up questions, build on context
+- Use 5-10 cards per response (up to 12 for complex topics)
+- Include quick-replies with 2-4 contextual chips
+- Never break RM character — you are a knowledgeable relationship manager
+` : ''}
 ## Topic-Specific Block Patterns
 
 **Idle cash / parking questions:**

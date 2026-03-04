@@ -66,7 +66,7 @@ export default function GetStartedStep() {
 
   const handleOpenChat = useCallback(() => {
     dispatch({ type: 'COMPLETE_ONBOARDING', payload: { lifecycle: 'zero-state' } });
-    setTimeout(() => dispatch({ type: 'OPEN_CONVERSATION' }), 300);
+    setTimeout(() => dispatch({ type: 'OPEN_RM_CHAT', payload: { context: { source: 'onboarding' } } }), 300);
   }, [dispatch]);
 
   const handleGoHome = useCallback(() => {
@@ -350,7 +350,7 @@ export default function GetStartedStep() {
               <button
                 onClick={() => {
                   dispatch({ type: 'COMPLETE_ONBOARDING', payload: { lifecycle: 'zero-state' } });
-                  setTimeout(() => dispatch({ type: 'OPEN_CONVERSATION' }), 300);
+                  setTimeout(() => dispatch({ type: 'OPEN_RM_CHAT', payload: { context: { source: 'onboarding' } } }), 300);
                 }}
                 style={{
                   fontFamily: fonts.sans, fontSize: '0.8125rem', color: colors.gold,
