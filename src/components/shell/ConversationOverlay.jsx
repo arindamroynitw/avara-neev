@@ -148,6 +148,29 @@ export default function ConversationOverlay() {
                     {String(msg.content)}
                   </div>
                 )}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', marginTop: '2px' }}>
+                  {[{ rating: 'up', emoji: '👍' }, { rating: 'down', emoji: '👎' }].map(({ rating, emoji }) => {
+                    const selected = msg.feedback === rating;
+                    const other = msg.feedback && msg.feedback !== rating;
+                    if (other) return null;
+                    return (
+                      <button
+                        key={rating}
+                        onClick={() => !msg.feedback && dispatch({ type: 'RATE_MESSAGE', payload: { index: i, rating } })}
+                        style={{
+                          width: '24px', height: '24px', borderRadius: '6px', fontSize: '13px',
+                          border: `1px solid ${selected ? colors.gold : colors.boneLight}`,
+                          background: selected ? 'rgba(212,175,55,0.1)' : 'transparent',
+                          cursor: msg.feedback ? 'default' : 'pointer',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          opacity: msg.feedback && !selected ? 0 : 1,
+                        }}
+                      >
+                        {emoji}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             )}
           </div>

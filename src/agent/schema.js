@@ -67,6 +67,9 @@ export const cardTypes = {
   'score': {
     requiredProps: ['value', 'label'],
   },
+  'quick-replies': {
+    requiredProps: ['suggestions'],
+  },
 };
 
 export function validateCard(card) {

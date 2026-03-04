@@ -72,6 +72,10 @@ function ActivateProductCard({ product, amount, productName, dispatch }) {
     const dailyEarnings = calculateDailyEarnings(amount, 7.2);
     dispatch({ type: 'ACTIVATE_PRODUCT', payload: { product, data: { balance: amount, dailyEarnings } } });
     dispatch({ type: 'UPDATE_METRICS', payload: { totalNeevBalance: amount, sweepCount: 1, totalSwept: amount } });
+    dispatch({ type: 'SET_LIFECYCLE', payload: 'active' });
+    dispatch({ type: 'SHOW_TOAST', payload: `${productName} activated — your money is now working.` });
+    setTimeout(() => dispatch({ type: 'HIDE_TOAST' }), 2500);
+    setTimeout(() => dispatch({ type: 'CLOSE_CONVERSATION' }), 400);
   };
 
   return (
@@ -485,6 +489,28 @@ function TimelineCard({ events, title }) {
   );
 }
 
+function QuickRepliesCard({ suggestions, dispatch }) {
+  if (!suggestions || suggestions.length === 0) return null;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '4px 0' }}>
+      {suggestions.map((s, i) => (
+        <button
+          key={i}
+          onClick={() => dispatch && dispatch({ type: 'ADD_MESSAGE', payload: { role: 'user', content: s, timestamp: Date.now() } })}
+          style={{
+            fontFamily: fonts.sans, fontSize: '0.75rem', fontWeight: 600,
+            padding: '8px 14px', borderRadius: '20px',
+            border: `1px solid ${colors.bone}`, background: colors.white,
+            color: colors.dark, cursor: 'pointer', whiteSpace: 'nowrap',
+          }}
+        >
+          {s}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function ScoreCard({ value, label, maxValue = 100, subtitle }) {
   const clampedValue = Math.min(maxValue, Math.max(0, value));
   const pct = clampedValue / maxValue;
@@ -572,6 +598,8 @@ export function renderCards(cards, dispatch) {
         return <div key={key} style={style}><TimelineCard {...card.props} /></div>;
       case 'score':
         return <div key={key} style={style}><ScoreCard {...card.props} /></div>;
+      case 'quick-replies':
+        return <div key={key} style={style}><QuickRepliesCard {...card.props} dispatch={dispatch} /></div>;
       default:
         // Fallback: render as text
         return (

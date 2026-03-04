@@ -231,6 +231,19 @@ export function reducer(state, action) {
         conversation: { ...state.conversation, error: action.payload, loading: false },
       };
 
+    case 'RATE_MESSAGE':
+      return {
+        ...state,
+        conversation: {
+          ...state.conversation,
+          thread: state.conversation.thread.map((msg, i) =>
+            i === action.payload.index
+              ? { ...msg, feedback: action.payload.rating }
+              : msg
+          ),
+        },
+      };
+
     // --- Sweep ---
     case 'SET_CURRENT_SWEEP':
       return { ...state, currentSweep: { ...state.currentSweep, ...action.payload } };

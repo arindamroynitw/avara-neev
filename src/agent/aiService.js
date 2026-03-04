@@ -19,36 +19,46 @@ function getOpenAI() {
   return openaiInstance;
 }
 
-/**
- * Robustly extract card array from AI response text.
- * Handles: {"cards":[...]}, bare arrays [{...},...], single card {type:...},
- * and text with JSON embedded after a preamble.
- */
-function parseCardsFromText(text) {
-  // 1. Try direct parse
+function tryExtractCards(str) {
   try {
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(str);
     if (parsed.cards && Array.isArray(parsed.cards)) return parsed.cards;
     if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].type) return parsed;
     if (parsed.type) return [parsed];
-  } catch {
-    // Not valid JSON as-is — try to extract JSON from the text
-  }
+  } catch {}
+  return null;
+}
 
-  // 2. Try to find a JSON object or array in the text (handles preamble/suffix)
+/**
+ * Robustly extract card array from AI response text.
+ * Handles: {"cards":[...]}, bare arrays [{...},...], single card {type:...},
+ * comma-separated objects {..},{..}, and objects with stray leading/trailing brackets.
+ */
+function parseCardsFromText(text) {
+  // 1. Try direct parse
+  const direct = tryExtractCards(text);
+  if (direct) return direct;
+
+  // 2. Slice from first [ or { (handles preamble text before JSON)
   const jsonStart = text.search(/[\[{]/);
-  if (jsonStart > 0) {
-    try {
-      const extracted = JSON.parse(text.slice(jsonStart));
-      if (extracted.cards && Array.isArray(extracted.cards)) return extracted.cards;
-      if (Array.isArray(extracted) && extracted.length > 0 && extracted[0].type) return extracted;
-      if (extracted.type) return [extracted];
-    } catch {
-      // Still not valid
-    }
-  }
+  if (jsonStart < 0) return [{ type: 'agent-text', props: { text } }];
 
-  // 3. Fallback: wrap raw text as agent-text bubble
+  const slice = text.slice(jsonStart);
+
+  // 2a. Try slice as-is
+  const asIs = tryExtractCards(slice);
+  if (asIs) return asIs;
+
+  // 2b. Normalise: strip one leading [ and/or one trailing ] then re-wrap.
+  // Handles patterns like: {..},{..}  |  {..},{..}]  |  [{..},{..}]  (AI omits outer wrapper)
+  let inner = slice;
+  if (inner.startsWith('[')) inner = inner.slice(1);
+  if (inner.endsWith(']')) inner = inner.slice(0, -1);
+
+  const rewrapped = tryExtractCards(`[${inner}]`);
+  if (rewrapped) return rewrapped;
+
+  // 3. Fallback: render raw text as a bubble so the user sees something
   return [{ type: 'agent-text', props: { text } }];
 }
 
