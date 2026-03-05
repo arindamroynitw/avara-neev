@@ -67,8 +67,34 @@ function parseCardsFromText(text) {
     }
   }
 
-  // 3. Fallback: wrap raw text as agent-text bubble
-  return [{ type: 'agent-text', props: { text } }];
+  // 3. Repair: comma-separated objects without array wrapper — wrap in []
+  if (text.includes('"type"')) {
+    try {
+      const result = tryExtractCards(JSON.parse(`[${text}]`));
+      if (result) return result;
+    } catch { }
+
+    // 4. Repair: missing closing } on last card before ]}
+    // Model sometimes drops the closing brace of the last card object
+    if (text.endsWith(']}')) {
+      for (let extra = 1; extra <= 2; extra++) {
+        try {
+          const repaired = text.slice(0, -2) + '}'.repeat(extra) + ']}';
+          const result = tryExtractCards(JSON.parse(repaired));
+          if (result) return result;
+        } catch { }
+      }
+    }
+  }
+
+  // 5. Fallback: wrap raw text as agent-text bubble with default quick-replies
+  return [
+    { type: 'agent-text', props: { text } },
+    { type: 'quick-replies', props: { chips: [
+      { label: 'What can you help with?', input: 'What can you help me with?' },
+      { label: 'Show me my idle cash', input: 'What is my idle cash?' },
+    ] } },
+  ];
 }
 
 /**
